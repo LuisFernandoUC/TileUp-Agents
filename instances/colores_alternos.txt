@@ -1,0 +1,17 @@
+# 3x3, 2 colores alternados. Exige planificar: colocar mal llena el tablero.
+3 2
+14
+1 1
+2 1
+1 1
+2 1
+1 1
+2 1
+1 1
+2 1
+1 1
+2 1
+1 1
+2 1
+1 1
+2 1

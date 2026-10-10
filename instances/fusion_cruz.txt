@@ -1,0 +1,10 @@
+# Cuatro fichas de color 1 en cruz (no adyacentes entre sí) y una quinta en el
+# centro: fusión de 5 fichas en una sola de valor 15.
+3 2
+6
+1 1
+1 2
+1 3
+1 4
+1 5
+2 9
