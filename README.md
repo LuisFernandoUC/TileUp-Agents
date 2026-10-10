@@ -2,8 +2,15 @@
 
 Agentes de búsqueda y evolutivos para el juego TileUp (IC-6200 Inteligencia Artificial, Tarea Corta 1).
 
-> Estado actual: motor, validador independiente, punto de entrada `solve` con un agente de referencia
-> (`aleatorio`), modo de juego manual y pruebas. Los agentes de búsqueda y evolutivo están en desarrollo.
+> Estado actual: motor, validador independiente, punto de entrada `solve`, agente de búsqueda (`busqueda`),
+> agente de referencia (`aleatorio`), modo de juego manual y pruebas. El agente evolutivo está en desarrollo.
+
+## Agentes
+
+| Nombre | Algoritmo | Esfuerzo informado | Documentación |
+|---|---|---|---|
+| `busqueda` | Beam search informado y anytime, con ancho creciente | `nodos_expandidos` | [docs/agente_busqueda.md](docs/agente_busqueda.md) |
+| `aleatorio` | Línea base: celda vacía al azar (no es uno de los dos agentes de la tarea) | `jugadas_evaluadas` | – |
 
 ## Requisitos
 
@@ -67,6 +74,7 @@ python -m unittest discover -s tests -t . -v
 | `tests/test_instance.py` | Lector de instancias: formato válido, comentarios, BOM y 18 variantes mal formadas |
 | `tests/test_scenarios.py` | Escenarios completos sobre `instances/` y la CLI (`play`), incluido el ejemplo del enunciado |
 | `tests/test_validator.py` | Validador: acepta soluciones legales (victoria, derrota, parciales) y rechaza 11 tipos de error; prueba diferencial motor contra validador en 300 partidas |
+| `tests/test_search_agent.py` | Agente de búsqueda: evaluación incremental igual a la completa, óptimo igual al de un resolvedor exacto independiente, límite de tiempo, compleción rápida, determinismo |
 | `tests/test_integration.py` | Integración: cada agente registrado resuelve instancias pequeñas por la CLI, el validador acepta la solución con las mismas métricas y la semilla fija el resultado |
 
 ## Formatos
@@ -87,12 +95,16 @@ tileup/
   cli.py         punto de entrada (python -m tileup solve | play)
   agents/
     base.py          contrato común: Agent, AgentResult, Deadline y registro
+    beam_search.py   agente de búsqueda (beam search)
     random_agent.py  agente de referencia (línea base)
 validator/       validador independiente (python -m validator)
 tools/
   generate_instance.py   generador de instancias por N, K, M y semilla
+  tune_search.py         ajuste por rejilla de los parámetros del agente de búsqueda
+results/         resultados de experimentos (p. ej. tuning_busqueda.csv)
 instances/       escenarios de prueba (ver docs/juego.md)
 docs/juego.md    análisis del juego y propiedades útiles para los agentes
+docs/agente_busqueda.md  formulación, heurística y ajuste del agente de búsqueda
 tests/           pruebas unitarias, de escenario y de integración
 ```
 

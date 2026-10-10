@@ -95,7 +95,8 @@ def play(args: argparse.Namespace) -> int:
 
 def time_budget(limit: float) -> float:
     """Tiempo que se le concede al agente: el límite menos un margen para escribir la solución."""
-    margin = min(1.0, max(0.05, 0.1 * limit))
+    # El reloj arranca dentro del programa: el margen mínimo cubre también el inicio del intérprete.
+    margin = min(1.0, max(0.15, 0.1 * limit))
     return max(0.0, limit - margin)
 
 

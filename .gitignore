@@ -6,5 +6,4 @@ env/
 .pytest_cache/
 .vscode/
 .idea/
-results/
 solutions/
