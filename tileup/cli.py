@@ -1,9 +1,14 @@
 """Punto de entrada de línea de comandos.
 
-    python -m tileup play <instancia> [--out solucion.txt] [--no-color]
+    python -m tileup solve <instancia> --agent NOMBRE --seed S --time-limit T [--out solucion.txt]
+    python -m tileup play  <instancia> [--out solucion.txt] [--no-color]
 
-``play`` permite jugar TileUp manualmente en la consola. Los subcomandos de los
-agentes se agregarán aquí mismo en una etapa posterior.
+``solve`` es el punto de entrada oficial: ejecuta un agente sobre la instancia, escribe el
+archivo de solución e informa las métricas por salida estándar. ``play`` permite jugar
+TileUp manualmente en la consola.
+
+Códigos de salida: 0 éxito (aunque la partida termine en derrota), 1 error de E/S,
+2 instancia inválida o argumentos incorrectos, 3 el agente propuso una jugada ilegal.
 """
 
 from __future__ import annotations
@@ -11,7 +16,10 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import time
+from pathlib import Path
 
+from .agents import AGENTS, Deadline
 from .engine import GameState, IllegalMoveError, Status
 from .instance import InstanceError, load_instance
 from .solution import summary_line, write_solution
@@ -85,9 +93,58 @@ def play(args: argparse.Namespace) -> int:
     return 0
 
 
+def time_budget(limit: float) -> float:
+    """Tiempo que se le concede al agente: el límite menos un margen para escribir la solución."""
+    margin = min(1.0, max(0.05, 0.1 * limit))
+    return max(0.0, limit - margin)
+
+
+def solve(args: argparse.Namespace) -> int:
+    start = time.perf_counter()
+    if args.time_limit <= 0:
+        print("error: --time-limit debe ser positivo", file=sys.stderr)
+        return 2
+    instance = load_instance(args.instance)
+    agent = AGENTS[args.agent]()
+    deadline = Deadline(time_budget(args.time_limit), start=start)
+    result = agent.solve(instance, args.seed, deadline)
+
+    # Las colocaciones se aplican sobre un estado nuevo del motor: el agente no puede
+    # saltarse las reglas, y las métricas informadas salen del motor, no del agente.
+    state = GameState(instance)
+    for step, (row, col) in enumerate(result.placements):
+        if state.is_terminal:
+            break
+        try:
+            state.place(row, col)
+        except IllegalMoveError as exc:
+            print(f"error: el agente '{args.agent}' propuso una jugada ilegal en el paso {step}: {exc}", file=sys.stderr)
+            return 3
+
+    out = args.out or Path("solutions") / f"{Path(args.instance).stem}.{args.agent}.s{args.seed}.txt"
+    write_solution(out, state)
+    elapsed = time.perf_counter() - start
+
+    print(f"agente={args.agent} semilla={args.seed} limite={args.time_limit}s instancia={args.instance}")
+    print(f"colocadas={state.placed} ocupadas={state.occupied} mayor={state.max_value} resultado={state.status.value}")
+    print(f"tiempo={elapsed:.3f}s {agent.effort_name}={result.effort}")
+    for key, value in result.stats.items():
+        print(f"{key}={value}")
+    print(f"solucion={out}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="tileup", description="TileUp: motor del juego y agentes.")
     sub = parser.add_subparsers(dest="command", required=True)
+
+    p_solve = sub.add_parser("solve", help="resolver una instancia con un agente")
+    p_solve.add_argument("instance", help="ruta del archivo de instancia")
+    p_solve.add_argument("--agent", required=True, choices=sorted(AGENTS), help="agente a utilizar")
+    p_solve.add_argument("--seed", type=int, required=True, help="semilla; fija todo el azar del agente")
+    p_solve.add_argument("--time-limit", type=float, required=True, help="límite de tiempo en segundos")
+    p_solve.add_argument("--out", help="archivo de solución (por defecto solutions/<instancia>.<agente>.s<semilla>.txt)")
+    p_solve.set_defaults(func=solve)
 
     p_play = sub.add_parser("play", help="jugar manualmente una instancia en la consola")
     p_play.add_argument("instance", help="ruta del archivo de instancia")
