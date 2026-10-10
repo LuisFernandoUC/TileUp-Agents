@@ -1,0 +1,9 @@
+# TileUp -- instancia de ejemplo (enunciado, sección 2)
+4 3   # tablero 4x4, 3 colores
+6     # 6 fichas en la secuencia
+1 2
+2 1
+1 3
+3 1
+1 1
+2 4
