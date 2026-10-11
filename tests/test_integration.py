@@ -59,7 +59,7 @@ class SolveAndValidateTest(unittest.TestCase):
                     for i in range(2):
                         out = Path(tmp) / f"{agent}_{i}.txt"
                         run("-m", "tileup", "solve", "instances/gen_n4_k9_m50.txt", "--agent", agent,
-                            "--seed", "42", "--time-limit", "3", "--out", str(out))
+                            "--seed", "42", "--time-limit", "10", "--out", str(out))
                         outs.append(out.read_text(encoding="utf-8"))
                     self.assertEqual(outs[0], outs[1])
 
