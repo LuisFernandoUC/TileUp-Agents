@@ -19,6 +19,27 @@ El informe con la formulación de los agentes, el ajuste de parámetros y la com
 
 - Python 3.10 o superior. **No hay dependencias externas**: todo usa la biblioteca estándar.
 
+## Inicio rápido (Makefile)
+
+Un solo comando resuelve una instancia y valida la solución, sin instalar nada:
+
+```bash
+make run INSTANCIA=instances/gen_n4_k9_m50.txt AGENTE=busqueda SEMILLA=1 LIMITE=10
+make test          # todas las pruebas
+make help          # lista el resto de objetivos
+```
+
+| Objetivo | Qué hace |
+|---|---|
+| `make run` | resuelve `INSTANCIA` con `AGENTE`, `SEMILLA` y `LIMITE` (s) y la valida; la solución queda en `solutions/` |
+| `make test` | corre las pruebas |
+| `make instancias` | regenera en `instances/comparacion/` las 12 instancias de la comparación (6 configuraciones × semillas 201 y 202) |
+| `make soluciones` | resuelve esas 12 instancias con los tres agentes (semilla 1) y valida cada solución; quedan en `results/soluciones/` |
+| `make validar` | valida con el validador independiente las soluciones guardadas en `results/soluciones/` |
+| `make comparar` | repite la comparación experimental y reescribe `results/comparacion_agentes.csv` |
+
+Si `python3` no es el intérprete deseado: `make run PYTHON=.venv/bin/python`.
+
 ## Uso
 
 Resolver una instancia con un agente (punto de entrada oficial):
@@ -57,7 +78,7 @@ python -m tileup play instances/ejemplo.txt --out solucion.txt
 ```
 
 En cada turno se muestra el tablero (fichas como `color:valor`), la ficha actual y las siguientes cinco.
-Se escribe `fila columna` (desde 0) para colocar la ficha
+Se escribe `fila columna` (desde 0) para colocar la ficha; `q` abandona la partida.
 Con `--out`, la solución se escribe al terminar, aun en derrota o abandono. `--no-color` desactiva los colores ANSI.
 
 Generar una instancia aleatoria:
@@ -65,6 +86,19 @@ Generar una instancia aleatoria:
 ```bash
 python tools/generate_instance.py N K M --seed S -o instances/mi_instancia.txt
 ```
+
+## Agente de búsqueda: formulación (resumen)
+
+Detalle y justificación en [docs/agente_busqueda.md](docs/agente_busqueda.md).
+
+| Elemento | Definición |
+|---|---|
+| Estado | índice de la siguiente ficha y color de cada una de las N² celdas (los valores no afectan la legalidad ni la ocupación) |
+| Operador de sucesión | colocar la ficha actual en una celda vacía y aplicar la fusión del motor |
+| Costo de una acción | 5 − \|G\|, con \|G\| el tamaño de la componente fusionada; el costo del camino equivale a la ocupación final |
+| Prueba de meta | se colocaron las M fichas; un tablero lleno con fichas pendientes es derrota |
+| Algoritmo | beam search por capas con ancho creciente (anytime); `f = ocupación + β·U`; la heurística **no es admisible**, así que el óptimo solo se garantiza si no se descartó ningún estado o se alcanza la cota inferior |
+| Esfuerzo | `nodos_expandidos` |
 
 ## Pruebas
 
@@ -111,7 +145,9 @@ tools/
   tune_evolutivo.py      barrido, un parámetro por vez, de los parámetros del agente evolutivo
   compare_agents.py      comparación de agentes con varias semillas (results/comparacion_agentes.csv)
 results/         resultados de experimentos (tuning_busqueda.csv, tuning_evolutivo_*.csv, comparacion_agentes.csv)
-instances/       escenarios de prueba (ver docs/juego.md)
+instances/       escenarios de prueba (ver docs/juego.md); instances/comparacion/ tiene las 12 de la comparación
+results/soluciones/  soluciones de los tres agentes sobre instances/comparacion/ (semilla 1), validadas
+Makefile         objetivos run, test, instancias, soluciones, validar, comparar
 docs/juego.md    análisis del juego y propiedades útiles para los agentes
 docs/agente_busqueda.md  formulación, heurística y ajuste del agente de búsqueda
 docs/agente_evolutivo.md  diseño, parámetros y experimentos del agente evolutivo
