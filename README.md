@@ -1,15 +1,18 @@
 # TileUp-Agents
 
 Agentes de búsqueda y evolutivos para el juego TileUp (IC-6200 Inteligencia Artificial, Tarea Corta 1).
+El informe con la formulación de los agentes, el ajuste de parámetros y la comparación experimental está en
+[docs/informe.md](docs/informe.md).
 
 > Estado actual: motor, validador independiente, punto de entrada `solve`, agente de búsqueda (`busqueda`),
-> agente de referencia (`aleatorio`), modo de juego manual y pruebas. El agente evolutivo está en desarrollo.
+> agente evolutivo (`evolutivo`), agente de referencia (`aleatorio`), modo de juego manual y pruebas.
 
 ## Agentes
 
 | Nombre | Algoritmo | Esfuerzo informado | Documentación |
 |---|---|---|---|
 | `busqueda` | Beam search informado y anytime, con ancho creciente | `nodos_expandidos` | [docs/agente_busqueda.md](docs/agente_busqueda.md) |
+| `evolutivo` | Algoritmo genético generacional con elitismo y decodificador guiado por fusiones | `evaluaciones_aptitud` | [docs/agente_evolutivo.md](docs/agente_evolutivo.md) |
 | `aleatorio` | Línea base: celda vacía al azar (no es uno de los dos agentes de la tarea) | `jugadas_evaluadas` | – |
 
 ## Requisitos
@@ -22,6 +25,7 @@ Resolver una instancia con un agente (punto de entrada oficial):
 
 ```bash
 python -m tileup solve instances/ejemplo.txt --agent aleatorio --seed 1 --time-limit 10
+python -m tileup solve instances/gen_n6_k20_m120.txt --agent evolutivo --seed 1 --time-limit 10
 ```
 
 | Argumento | Significado |
@@ -75,6 +79,8 @@ python -m unittest discover -s tests -t . -v
 | `tests/test_scenarios.py` | Escenarios completos sobre `instances/` y la CLI (`play`), incluido el ejemplo del enunciado |
 | `tests/test_validator.py` | Validador: acepta soluciones legales (victoria, derrota, parciales) y rechaza 11 tipos de error; prueba diferencial motor contra validador en 300 partidas |
 | `tests/test_search_agent.py` | Agente de búsqueda: evaluación incremental igual a la completa, óptimo igual al de un resolvedor exacto independiente, límite de tiempo, compleción rápida, determinismo |
+| `tests/test_evolutivo_nucleo.py` | Núcleo del agente evolutivo: decodificadores A, B y C (legalidad con genomas aleatorios, preferencia por fusionar), reparación, aptitud y evaluador |
+| `tests/test_agente_evolutivo.py` | Agente evolutivo: criterios de paro (cota, tope, estancamiento, reloj), validación de parámetros, determinismo con la semilla |
 | `tests/test_integration.py` | Integración: cada agente registrado resuelve instancias pequeñas por la CLI, el validador acepta la solución con las mismas métricas y la semilla fija el resultado |
 
 ## Formatos
@@ -96,15 +102,20 @@ tileup/
   agents/
     base.py          contrato común: Agent, AgentResult, Deadline y registro
     beam_search.py   agente de búsqueda (beam search)
+    evolutivo.py     agente evolutivo (algoritmo genético)
     random_agent.py  agente de referencia (línea base)
 validator/       validador independiente (python -m validator)
 tools/
   generate_instance.py   generador de instancias por N, K, M y semilla
   tune_search.py         ajuste por rejilla de los parámetros del agente de búsqueda
-results/         resultados de experimentos (p. ej. tuning_busqueda.csv)
+  tune_evolutivo.py      barrido, un parámetro por vez, de los parámetros del agente evolutivo
+  compare_agents.py      comparación de agentes con varias semillas (results/comparacion_agentes.csv)
+results/         resultados de experimentos (tuning_busqueda.csv, tuning_evolutivo_*.csv, comparacion_agentes.csv)
 instances/       escenarios de prueba (ver docs/juego.md)
 docs/juego.md    análisis del juego y propiedades útiles para los agentes
 docs/agente_busqueda.md  formulación, heurística y ajuste del agente de búsqueda
+docs/agente_evolutivo.md  diseño, parámetros y experimentos del agente evolutivo
+docs/informe.md  informe breve: agentes, parámetros, ajuste y comparación experimental
 tests/           pruebas unitarias, de escenario y de integración
 ```
 
