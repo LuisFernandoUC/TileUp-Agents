@@ -4,8 +4,6 @@ Agentes de búsqueda y evolutivos para el juego TileUp (IC-6200 Inteligencia Art
 El informe con la formulación de los agentes, el ajuste de parámetros y la comparación experimental está en
 [docs/informe.md](docs/informe.md).
 
-> Estado actual: motor, validador independiente, punto de entrada `solve`, agente de búsqueda (`busqueda`),
-> agente evolutivo (`evolutivo`), agente de referencia (`aleatorio`), modo de juego manual y pruebas.
 
 ## Agentes
 
