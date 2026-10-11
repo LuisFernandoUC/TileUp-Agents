@@ -15,10 +15,11 @@ SEMILLAS_I := 201 202
 DIR_INST   := instances/comparacion
 DIR_SOL    := results/soluciones
 
-.PHONY: help run test validar instancias soluciones comparar
+.PHONY: help run todo test validar instancias soluciones comparar
 
 help:
 	@echo "make run        resuelve INSTANCIA con AGENTE (SEMILLA, LIMITE) y valida la solución"
+	@echo "make todo       ambos agentes sobre instances/ con validación (python run_all.py)"
 	@echo "make test       corre todas las pruebas"
 	@echo "make validar    valida las soluciones guardadas en $(DIR_SOL)"
 	@echo "make instancias regenera las instancias de la comparación en $(DIR_INST)"
@@ -30,6 +31,9 @@ run:
 	@out=solutions/$(notdir $(basename $(INSTANCIA))).$(AGENTE).s$(SEMILLA).txt; \
 	$(PYTHON) -m tileup solve $(INSTANCIA) --agent $(AGENTE) --seed $(SEMILLA) --time-limit $(LIMITE) --out $$out \
 	&& $(PYTHON) -m validator $(INSTANCIA) $$out
+
+todo:
+	$(PYTHON) run_all.py --time-limit $(LIMITE)
 
 test:
 	$(PYTHON) -m unittest discover -s tests -t .

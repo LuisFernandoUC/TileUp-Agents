@@ -19,9 +19,27 @@ El informe con la formulación de los agentes, el ajuste de parámetros y la com
 
 - Python 3.10 o superior. **No hay dependencias externas**: todo usa la biblioteca estándar.
 
+## Inicio rápido (cualquier sistema, sin `make`)
+
+Un solo comando ejecuta **ambos agentes** (búsqueda y evolutivo) sobre las instancias y **valida cada solución**
+con el validador independiente. Solo requiere Python; funciona igual en Windows, Linux y macOS:
+
+```bash
+python run_all.py                                         # ambos agentes sobre instances/*.txt, límite 10 s
+python run_all.py --tests                                 # corre antes las pruebas automatizadas
+python run_all.py instances/mi_instancia.txt --time-limit 30
+python run_all.py instances/comparacion --seeds 1 2 3 --agents busqueda evolutivo aleatorio
+```
+
+Por cada instancia × agente × semilla se ejecuta `python -m tileup solve` y luego `python -m validator`, y se
+verifica que (1) la solución sea VALIDA, (2) las métricas del programa coincidan con las del validador y (3) el
+tiempo real, incluido el arranque de Python, no exceda el límite. Las soluciones y un `resumen.csv` quedan en
+`solutions/` (se cambia con `--out-dir`). Termina con código 1 si alguna corrida falla.
+
 ## Inicio rápido (Makefile)
 
-Un solo comando resuelve una instancia y valida la solución, sin instalar nada:
+Si el sistema tiene `make` (Linux y macOS suelen tenerlo; Windows no), un solo comando resuelve una instancia y
+valida la solución, sin instalar nada:
 
 ```bash
 make run INSTANCIA=instances/gen_n4_k9_m50.txt AGENTE=busqueda SEMILLA=1 LIMITE=10
@@ -152,6 +170,7 @@ docs/juego.md    análisis del juego y propiedades útiles para los agentes
 docs/agente_busqueda.md  formulación, heurística y ajuste del agente de búsqueda
 docs/agente_evolutivo.md  diseño, parámetros y experimentos del agente evolutivo
 docs/informe.md  informe breve: agentes, parámetros, ajuste y comparación experimental
+run_all.py       ejecuta ambos agentes y valida cada solución (alternativa portable al Makefile)
 tests/           pruebas unitarias, de escenario y de integración
 ```
 

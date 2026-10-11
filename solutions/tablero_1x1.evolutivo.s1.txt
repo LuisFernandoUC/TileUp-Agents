@@ -1,0 +1,2 @@
+0 0 0
+# colocadas=1 ocupadas=1 mayor=5
