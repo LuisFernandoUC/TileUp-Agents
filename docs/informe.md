@@ -98,10 +98,13 @@ python tools/tune_search.py          # ajuste del agente de búsqueda
 python tools/tune_evolutivo.py       # barridos del agente evolutivo
 python tools/compare_agents.py       # comparación de esta sección
 python -m unittest discover -s tests -t .
+make run | test | instancias | soluciones | validar | comparar   # atajos (ver README)
 ```
 
 Misma instancia y misma semilla dan la misma solución, salvo que el reloj corte la ejecución (relevante para `busqueda`).
 
 ## 7. Uso de inteligencia artificial
 
-Usé Claude para discutir alternativas de diseño, ejecutar y resumir los experimentos y redactar la documentación. Los resultados citados salen de las corridas guardadas o descritas en `agente_evolutivo.md`.
+**Cómo y dónde.** Se usó Claude (Anthropic) como asistente a lo largo del trabajo: para discutir alternativas de diseño de los dos agentes, para depurar parte del código y de las pruebas, para ejecutar y resumir los experimentos. Las decisiones de diseño y qué resultados reportar las tomó el grupo.
+
+**Límites.** El código y las pruebas generados con ayuda de IA se revisaron y se ejecutaron, pero las pruebas automáticas son la principal garantía de corrección.
