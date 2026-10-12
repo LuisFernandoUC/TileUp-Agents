@@ -179,3 +179,8 @@ Se crea un módulo en `tileup/agents/` con una subclase de `Agent` decorada con 
 medida de esfuerzo. Luego se importa el módulo en `tileup/agents/__init__.py`. El programa vuelve a aplicar
 las colocaciones sobre el motor, así que un agente no puede saltarse las reglas. Las pruebas de integración
 cubren automáticamente a cualquier agente registrado.
+
+## Links importantes
+
+Repositorio: https://github.com/LuisFernandoUC/TileUp-Agents
+Video: https://youtu.be/Dj5LM5rzEJ8
